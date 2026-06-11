@@ -1,0 +1,4 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"Авторизованный пользователь заполняет форму и создаёт рецепт","3272","Успешное создание рецепта","tests","2026-06-11","passed","2026-06-11","TestCreateRecipe","test_create_recipe","",""
+"","4692","Успешное создание аккаунта","tests","2026-06-11","passed","2026-06-11","TestRegistration","test_registration","",""
+"","8647","Успешная авторизация пользователя","tests","2026-06-11","passed","2026-06-11","TestLogin","test_login","",""

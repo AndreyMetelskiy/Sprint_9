@@ -1,17 +1,14 @@
 import os
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+
 from pages.login_page import LoginPage
 from pages.register_page import RegisterPage
 from pages.main_page import MainPage
-from test_data import get_unique_user
+from helpers import get_unique_user
 
-
-import os
-import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
 @pytest.fixture(scope="function")
 def driver():
@@ -19,7 +16,6 @@ def driver():
         selenoid_options = Options()
         selenoid_options.add_argument("--window-size=1920,1080")
         selenoid_options.add_argument("--log-level=3")
-        
         selenoid_options.set_capability("browserName", "chrome")
         selenoid_options.set_capability("browserVersion", "128.0")
         selenoid_options.set_capability("selenoid:options", {
@@ -40,7 +36,6 @@ def driver():
     browser.quit()
 
 
-
 @pytest.fixture(scope="function")
 def registered_user(driver):
     user = get_unique_user()
@@ -59,8 +54,7 @@ def registered_user(driver):
 @pytest.fixture(scope="function")
 def authorized_driver(driver, registered_user):
     login_page = LoginPage(driver)
-    main_page = MainPage(driver)
     login_page.open()
     login_page.login(registered_user["username"], registered_user["password"])
-    main_page.is_logout_button_visible()
+    assert MainPage(driver).is_logout_button_visible(), "Авторизация не прошла: кнопка 'Выход' не отображается"
     yield driver

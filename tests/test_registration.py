@@ -1,6 +1,8 @@
 import allure
+
 from pages.register_page import RegisterPage
-from test_data import get_unique_user
+from helpers import get_unique_user
+
 
 @allure.feature("Регистрация")
 class TestRegistration:
@@ -21,7 +23,7 @@ class TestRegistration:
                 last_name=user["last_name"],
                 password=user["password"]
             )
-            register_page.accept_registration_alert()
+            register_page.accept_alert(timeout=3)
 
         with allure.step("Проверить переход на страницу авторизации и отображение формы"):
             assert register_page.is_login_page_opened(), "Переход на страницу /signin не произошел"

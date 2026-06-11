@@ -1,6 +1,7 @@
 import allure
+
 from pages.create_recipe_page import CreateRecipePage
-from test_data import RECIPE
+from test_data import RecipeData
 
 
 @allure.feature("Создание рецепта")
@@ -17,11 +18,12 @@ class TestCreateRecipe:
         with allure.step("Заполнить форму и отправить рецепт"):
             create_page.create_new_recipe(
                 filename="test_image.jpg",
-                name=RECIPE["name"],
-                description=RECIPE.get("description", "Смешать ингредиенты и запекать."),
-                ingredient=RECIPE["ingredient"],
-                amount=RECIPE["ingredient_amount"],
-                cooking_time=RECIPE["cooking_time"]
+                name=RecipeData.NAME,
+                description=RecipeData.DESCRIPTION,
+                ingredient=RecipeData.INGREDIENT,
+                amount=RecipeData.INGREDIENT_AMOUNT,
+                cooking_time=RecipeData.COOKING_TIME,
             )
+
         with allure.step("Проверить отображение карточки рецепта с названием"):
-            assert create_page.is_recipe_title_visible(RECIPE["name"])
+            assert create_page.is_recipe_title_visible(RecipeData.NAME)

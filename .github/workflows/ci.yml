@@ -1,0 +1,78 @@
+# Имя воркфлоу, которое отображается в интерфейсе GitHub Actions
+name: Selenoid Tests Workflow
+
+# Спусковой крючок (триггер): воркфлоу запускается при любом push в эти ветки
+on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+
+# Явные права на запись для автоматического деплоя Allure-отчета на GitHub Pages
+permissions:
+  contents: write
+
+# Список задач для выполнения
+jobs:
+  run-selenoid-tests:
+    # Окружение (раннер), в котором будут выполняться шаги
+    runs-on: ubuntu-latest
+
+    # Перечень последовательных шагов (команд)
+    steps:
+      # Шаг 1: Клонируем исходный код репозитория, делая проект доступным раннеру
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Устанавливаем и запускаем утилиту tree для вывода дерева проекта в лог
+      - name: Install tree utility
+        run: sudo apt-get update && sudo apt-get install -y tree
+
+      - name: Print project tree
+        run: tree .
+
+      # Шаг 3: Настраиваем окружение Python версии 3.10 на раннере
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # Шаг 4: Скачиваем образ браузера Chrome 128.0, который прописан в browsers.json
+      - name: Pull Selenoid Chrome Image
+        run: docker pull selenoid/chrome:128.0
+
+      # Шаг 5: Разворачиваем Selenoid и запускаем автотесты через актуальную команду docker compose
+      - name: Start Selenoid and Run Tests via Docker Compose
+        continue-on-error: true
+        run: |
+          docker compose up --build --abort-on-container-exit --exit-code-from test_docker
+
+
+      # Шаг 6: Скачиваем историю прошлых запусков из ветки gh-pages для красивых графиков Allure
+      - name: Get Allure history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      # Шаг 7: Генерируем Allure-отчет на основе папки результатов allure-results
+      - name: Generate Allure Report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+          keep_reports: 20
+
+      # Шаг 8: Публикуем готовый скомпилированный Allure-отчет в изолированную ветку gh-pages
+      - name: Deploy Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
